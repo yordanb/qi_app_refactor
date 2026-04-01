@@ -1,5 +1,4 @@
 import "package:dio/dio.dart";
-import "package:flutter/foundation.dart";
 import "package:connectivity_plus/connectivity_plus.dart";
 import "../errors/exceptions.dart";
 import "../storage/secure_storage_service.dart";
