@@ -27,7 +27,7 @@ class AppLogger {
   }
 
   /// Error - selalu muncul (critical)
-  static void e(String message, {String? tag, Error? error, StackTrace? stackTrace}) {
+  static void e(String message, {String? tag, Object? error, StackTrace? stackTrace}) {
     final timestamp = DateTime.now().toIso8601String().split('T')[1].split('.')[0];
     print('[$timestamp] [ERROR]${tag != null ? '[$tag]' : ''} $message${error != null ? '\n$error' : ''}');
     if (kDebugMode && stackTrace != null) {
