@@ -12,7 +12,7 @@ include: package:flutter_lints/flutter.yaml
 linter:
   rules:
     # Essential safety rules
-    avoid_print: true  #禁止在生产代码中使用 print
+    avoid_print: true  # 禁止在生产代码中使用 print
     avoid_relative_lib_imports: true
     avoid_web_libraries_in_flutter: true
     prefer_relative_imports: false  # 使用 package imports
@@ -51,7 +51,6 @@ linter:
     prefer_const_constructors_in_immutables: true
     prefer_const_declarations: true
     prefer_const_literals_to_create_immutables: true
-    prefer_const_constructors_to_const_factories: true
     prefer_construction_add_totals: true
     prefer_double_quotes: true
     prefer_early_return: true
@@ -59,10 +58,8 @@ linter:
     prefer_final_fields: true
     prefer_final_in_for_each: true
     prefer_final_locals: true
-    prefer_for_elements_to_map_fromIterable: false
     prefer_function_declarations_over_variables: true
     prefer_generic_function_type_aliases: true
-    prefer_if_elements_to_conditional_expressions: false
     prefer_if_null_operators: true
     prefer_initializing_formals: true
     prefer_inlined_adds: true

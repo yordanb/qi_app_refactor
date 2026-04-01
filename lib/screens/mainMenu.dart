@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import '../providers/kpi_provider.dart';
+import '../providers/bar_chart_provider.dart';
+import '../auth/auth_service.dart';
 import '../auth/login_page.dart';
 import 'page_menu_adm_config.dart';
 import 'page_menu_adm_news.dart';

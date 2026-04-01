@@ -1,4 +1,5 @@
 import "package:dio/dio.dart";
+import "package:flutter/foundation.dart";
 import "package:connectivity_plus/connectivity_plus.dart";
 import "../errors/exceptions.dart";
 import "../storage/secure_storage_service.dart";
@@ -53,12 +54,16 @@ class DioClient {
   Future<bool> hasInternetConnection() async {
     try {
       final connectivityResult = await _connectivity.checkConnectivity();
-      if (connectivityResult == ConnectivityResult.none) {
-        return false;
+      // connectivity_plus returns List<ConnectivityResult> in newer versions
+      // Check if any network is available (not none)
+      if (connectivityResult is List) {
+        return connectivityResult
+            .cast<ConnectivityResult>()
+            .any((result) => result != ConnectivityResult.none);
+      } else if (connectivityResult is ConnectivityResult) {
+        return connectivityResult != ConnectivityResult.none;
       }
-      // Double-check dengan ping ke Google (opsional)
-      // bisa juga ping ke own server
-      return true;
+      return false;
     } catch (_) {
       return false;
     }
@@ -78,7 +83,7 @@ class _AuthInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     // Inject token jika ada
-    final token = await SecureStorageService.getToken();
+    final token = await _storage.getToken();
     if (token != null) {
       options.headers["Authorization"] = "Bearer $token";
     }
@@ -86,10 +91,13 @@ class _AuthInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) async {
+  void onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
     // Jika 401, coba refresh token sekali
     if (err.response?.statusCode == 401) {
-      final refreshToken = await SecureStorageService.getRefreshToken();
+      final refreshToken = await _storage.getRefreshToken();
       if (refreshToken != null) {
         try {
           final refreshResponse = await _dio.post(
@@ -102,9 +110,9 @@ class _AuthInterceptor extends Interceptor {
             final newRefreshToken = refreshResponse.data["refresh_token"];
 
             // Simpan token baru
-            await SecureStorageService.setToken(newToken);
+            await _storage.setToken(newToken);
             if (newRefreshToken != null) {
-              await SecureStorageService.setRefreshToken(newRefreshToken);
+              await _storage.setRefreshToken(newRefreshToken);
             }
 
             // Retry request dengan token baru
@@ -134,7 +142,10 @@ class _LoggingInterceptor extends Interceptor {
   _LoggingInterceptor(this._isEnabled);
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+  void onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) {
     if (_isEnabled) {
       print("➡️  ${options.method} ${options.uri}");
       print("Headers: ${options.headers}");
@@ -146,7 +157,10 @@ class _LoggingInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
+  void onResponse(
+    Response response,
+    ResponseInterceptorHandler handler,
+  ) {
     if (_isEnabled) {
       print("⬅️  ${response.statusCode} ${response.requestOptions.uri}");
       print("Response: ${response.data}");
@@ -176,31 +190,20 @@ class _RetryInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     // Hanya retry untuk network errors (timeout, connection refused)
     // Jangan retry untuk 4xx errors (kecuali 408 Request Timeout)
-    if (_shouldRetry(err) && err.requestOptions.retryCount < _maxRetries) {
-      final retryCount = err.requestOptions.retryCount + 1;
+    if (_shouldRetry(err) && _getRetryCount(err) < _maxRetries) {
+      final retryCount = _getRetryCount(err) + 1;
       final delay = _calculateDelay(retryCount);
 
-      print(
-        "🔄 Retrying ${err.requestOptions.uri} (attempt $retryCount) after $delay",
-      );
+      print("🔄 Retrying ${err.requestOptions.uri} (attempt $retryCount) after $delay");
 
       await Future.delayed(delay);
 
-      final options = Options(
-        method: err.requestOptions.method,
-        headers: err.requestOptions.headers,
-      );
+      // Clone request options and increment retry count in extra
+      final requestOptions = err.requestOptions;
+      requestOptions.extra["retryCount"] = retryCount;
 
       try {
-        final response = await _dio.request<dynamic>(
-          err.requestOptions.path,
-          data: err.requestOptions.data,
-          queryParameters: err.requestOptions.queryParameters,
-          options: options,
-          extra: err.requestOptions.extra,
-          // Increment retry count
-          retryCount: retryCount,
-        );
+        final response = await _dio.fetch(requestOptions);
         return handler.resolve(response);
       } catch (e) {
         handler.next(err);
@@ -208,6 +211,10 @@ class _RetryInterceptor extends Interceptor {
     } else {
       handler.next(err);
     }
+  }
+
+  int _getRetryCount(DioException err) {
+    return err.requestOptions.extra["retryCount"] as int? ?? 0;
   }
 
   bool _shouldRetry(DioException err) {
@@ -266,17 +273,17 @@ class _ErrorInterceptor extends Interceptor {
             return UnauthorizedException();
           case 403:
             return ApiException(
-              "Akses ditolak. Anda tidak memiliki izin.",
+              'Akses ditolak. Anda tidak memiliki izin.',
               statusCode: statusCode,
             );
           case 404:
             return ApiException(
-              "Resource tidak ditemukan.",
+              'Resource tidak ditemukan.',
               statusCode: statusCode,
             );
           case 500:
             return ServerException(
-              "Server error. Silakan coba lagi nanti.",
+              'Server error. Silakan coba lagi nanti.',
               statusCode: statusCode,
             );
           default:
@@ -286,7 +293,7 @@ class _ErrorInterceptor extends Interceptor {
             );
         }
       case DioExceptionType.cancel:
-        return ApiException("Request dibatalkan.");
+        return ApiException('Request dibatalkan.');
       case DioExceptionType.unknown:
       default:
         return NoInternetException();

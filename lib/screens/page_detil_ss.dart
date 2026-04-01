@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/ss_detil_provider.dart';
-import '../auth/auth_service.dart';
 import '../core/storage/secure_storage_service.dart';
 import '../component/error_handler.dart';
 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import '../providers/ss_provider.dart';
-import '../providers/connectivity_provider.dart';
 import '../models/ss_filter_params.dart';
 import '../screens/page_detil_ss.dart';
 import '../auth/login_page.dart';
