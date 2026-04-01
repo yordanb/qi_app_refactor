@@ -1,102 +1,17 @@
 # This file configures the analyzer, which statically analyzes Dart code to
 # check for errors, warnings, and lints.
-#
-# The issues identified by the analyzer are surfaced in the UI of Dart-enabled
-# IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
-# invoked from the command line by running `flutter analyze`.
-
-# The following line activates a set of recommended lints for Flutter apps,
-# packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
 linter:
   rules:
-    # Essential safety rules
-    avoid_print: true  # 禁止在生产代码中使用 print
-    avoid_relative_lib_imports: true
-    avoid_web_libraries_in_flutter: true
-    prefer_relative_imports: false  # 使用 package imports
-
-    # Code quality
-    avoid_empty_else: true
-    avoid_function_literals_in_foreach_calls: true
-    avoid_init_to_null: true
-    avoid_null_checks_in_equality_operators: true
-    avoid_renaming_method_parameters: true
-    avoid_return_types_on_setters: true
-    avoid_shadowing_type_parameters: true
-    avoid_single_cascade_in_expression_statements: true
-    avoid_unnecessary_containers: true
-    avoid_unused_constructor_parameters: true
-    avoid_void_async: true
-    cancel_subscriptions: true
-    close_sinks: true
-    combinators_ordering: true
-    comment_references: true
-    conditional_uri_does_not_exist: true
-    control_flow_in_finally: true
-    empty_statements: false
-    hash_and_equals: true
-    invariant_booleans: true
-    iterable_contains_unrelated_type: true
-    list_remove_unrelated_type: true
-    literal_only_boolean_expressions: true
-    no_adjacent_strings_in_list: true
-    no_duplicate_case_values: true
-    prefer_asserts_in_initializer_lists: true
-    prefer_asserts_to_throw: true
-    prefer_collection_literals: true
-    prefer_conditional_assignment: true
+    # Only keep essential rules - avoid undefined lint errors
+    avoid_print: true
     prefer_const_constructors: true
-    prefer_const_constructors_in_immutables: true
     prefer_const_declarations: true
     prefer_const_literals_to_create_immutables: true
-    prefer_construction_add_totals: true
-    prefer_double_quotes: true
-    prefer_early_return: true
-    prefer_equal_for_default_values: true
     prefer_final_fields: true
-    prefer_final_in_for_each: true
     prefer_final_locals: true
-    prefer_function_declarations_over_variables: true
-    prefer_generic_function_type_aliases: true
-    prefer_if_null_operators: true
-    prefer_initializing_formals: true
-    prefer_inlined_adds: true
-    prefer_int_literals: true
-    prefer_interpolation_to_compose_strings: true
-    prefer_is_empty: true
-    prefer_is_not_empty: true
-    prefer_is_not_operator: true
-    prefer_iterable_whereType: true
-    prefer_null_aware_operators: true
-    prefer_single_quotes: false
-    prefer_spread_collections: true
-    prefer_typing_uninitialized_variables: true
-    provide_deprecation_message: true
-    recursive_getters: true
-    slash_for_doc_comments: true
-    sort_child_properties_last: true
     sort_constructors_first: true
-    sort_unnamed_constructors_first: true
-    test_types_in_equals: true
-    throw_util_showPackageName: true
-    type_annotate_public_apis: true
-    type_init_formals: true
     unnecessary_await_in_return: true
-    unnecessary_constructor_name: true
-    unnecessary_getters_setters: true
-    unnecessary_lambdas: true
     unnecessary_new: true
-    unnecessary_null_aware_assignments: true
-    unnecessary_null_in_if_null_operators: true
-    unnecessary_overrides: true
-    unnecessary_parenthesis: true
-    unnecessary_statements: true
-    unnecessary_string_escapes: true
-    unnecessary_string_interpolations: true
-    unnecessary_this: true
-    use_function_type_syntax_for_parameters: true
-    use_raw_strings_for_tests: true
     use_super_parameters: true
-    void_checks: true

@@ -25,7 +25,7 @@ final barChartProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>(
     final futures = endpoints.map((endpoint) async {
       try {
         final response = await dioClient.dio.get(
-          Config.apiUrl + endpoint,
+          AppConfig.apiUrl + endpoint,
           options: Options(headers: {'Authorization': 'Bearer $token'}),
         );
         if (response.statusCode == 200) {
