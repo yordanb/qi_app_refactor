@@ -117,12 +117,7 @@ class PageMenuSS extends ConsumerWidget {
                 .toList(),
             onChanged: (newKategori) {
               if (newKategori != null) {
-                final defaultSub = _menu2Items[newKategori]!.first;
-                ref.read(ssFilterProvider.notifier).state = SSFilterParams(
-                  kategori: newKategori,
-                  subKategori: defaultSub,
-                  opsiTambahan: null,
-                );
+                ref.read(ssFilterProvider.notifier).updateKategori(newKategori);
               }
             },
           ),
@@ -133,13 +128,7 @@ class PageMenuSS extends ConsumerWidget {
                 .toList(),
             onChanged: (newSub) {
               if (newSub != null) {
-                final opsiTambahan = (newSub == 'zero' || newSub == '<5')
-                    ? subOptions.first
-                    : null;
-                ref.read(ssFilterProvider.notifier).state = filter.copyWith(
-                  subKategori: newSub,
-                  opsiTambahan: opsiTambahan,
-                );
+                ref.read(ssFilterProvider.notifier).updateSubKategori(newSub);
               }
             },
           ),
@@ -151,9 +140,7 @@ class PageMenuSS extends ConsumerWidget {
                   .toList(),
               onChanged: (newOpsi) {
                 if (newOpsi != null) {
-                  ref.read(ssFilterProvider.notifier).state = filter.copyWith(
-                    opsiTambahan: newOpsi,
-                  );
+                  ref.read(ssFilterProvider.notifier).updateOpsiTambahan(newOpsi);
                 }
               },
             ),
