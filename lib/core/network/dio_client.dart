@@ -2,6 +2,7 @@ import "package:dio/dio.dart";
 import "package:connectivity_plus/connectivity_plus.dart";
 import "../errors/exceptions.dart";
 import "../storage/secure_storage_service.dart";
+import "../utils/logger.dart";
 
 /// Advanced HTTP client dengan interceptors, retry, dan error handling
 class DioClient {
@@ -121,8 +122,9 @@ class _AuthInterceptor extends Interceptor {
             final response = await _dio.fetch(requestOptions);
             return handler.resolve(response);
           }
-        } catch (_) {
+        } catch (e) {
           // Refresh gagal, clear storage dan redirect ke login
+          AppLogger.e('Refresh token failed', error: e);
           await _storage.clearAuth();
           // TODO: navigate to login - handled di UI layer
         }
@@ -146,10 +148,12 @@ class _LoggingInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) {
     if (_isEnabled) {
-      print("➡️  ${options.method} ${options.uri}");
-      print("Headers: ${options.headers}");
+      AppLogger.d('${options.method} ${options.uri}', tag: 'DIO');
+      if (options.headers.isNotEmpty) {
+        AppLogger.d('Headers: ${options.headers}', tag: 'DIO');
+      }
       if (options.data != null) {
-        print("Body: ${options.data}");
+        AppLogger.d('Body: ${options.data}', tag: 'DIO');
       }
     }
     handler.next(options);
@@ -161,8 +165,10 @@ class _LoggingInterceptor extends Interceptor {
     ResponseInterceptorHandler handler,
   ) {
     if (_isEnabled) {
-      print("⬅️  ${response.statusCode} ${response.requestOptions.uri}");
-      print("Response: ${response.data}");
+      AppLogger.i('${response.statusCode} ${response.requestOptions.uri}', tag: 'DIO');
+      if (response.data != null) {
+        AppLogger.i('Response: ${response.data}', tag: 'DIO');
+      }
     }
     handler.next(response);
   }
@@ -170,8 +176,8 @@ class _LoggingInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     if (_isEnabled) {
-      print("❌ Error: ${err.message}");
-      print("URI: ${err.requestOptions.uri}");
+      AppLogger.e('Error: ${err.message}', tag: 'DIO');
+      AppLogger.e('URI: ${err.requestOptions.uri}', tag: 'DIO');
     }
     handler.next(err);
   }
@@ -193,7 +199,7 @@ class _RetryInterceptor extends Interceptor {
       final retryCount = _getRetryCount(err) + 1;
       final delay = _calculateDelay(retryCount);
 
-      print("🔄 Retrying ${err.requestOptions.uri} (attempt $retryCount) after $delay");
+      AppLogger.d('Retrying ${err.requestOptions.uri} (attempt $retryCount) after ${delay.inMilliseconds}ms', tag: 'RETRY');
 
       await Future.delayed(delay);
 
