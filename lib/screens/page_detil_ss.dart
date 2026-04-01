@@ -1,26 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/ss_detil_provider.dart';
-import '../auth/db_service.dart';
+import '../auth/auth_service.dart';
+import '../core/storage/secure_storage_service.dart';
 import '../component/error_handler.dart';
 
 class PageDetilSS extends ConsumerWidget {
   final String nrp;
+  final String? nama; // Optional: passed from previous page
 
-  const PageDetilSS({super.key, required this.nrp});
+  const PageDetilSS({super.key, required this.nrp, this.nama});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detailData = ref.watch(ssDetailProvider(nrp));
     final updateInfo = ref.watch(ssUpdateProvider(nrp));
-    final namaAsync = FutureProvider<String?>((ref) => DBService.get("nama"));
+
+    // Ambil nama dari parameter, atau dari storage, atau default
+    final namaAsync = FutureProvider<String?>((ref) async {
+      if (nama != null) return nama;
+      // Fallback: ambil dari SecureStorage (NRP通常是 nama alternate)
+      final storage = SecureStorageService();
+      return await storage.getNRP(); // atau bisa buat getNama() later
+    });
 
     return Scaffold(
       appBar: AppBar(
         title: Consumer(
           builder: (context, ref, _) {
-            final nama = ref.watch(namaAsync);
-            return nama.when(
+            final namaValue = ref.watch(namaAsync);
+            return namaValue.when(
               data: (val) => Text(val ?? 'Unknown'),
               loading: () => const Text('Loading...'),
               error: (_, __) => const Text('Error'),

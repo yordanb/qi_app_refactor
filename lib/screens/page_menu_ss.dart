@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import '../providers/ss_provider.dart';
 import '../providers/connectivity_provider.dart';
 import '../models/ss_filter_params.dart';
-import '../auth/db_service.dart';
 import '../screens/page_detil_ss.dart';
 import '../auth/login_page.dart';
 import '../component/error_handler.dart';
@@ -64,12 +63,13 @@ class PageMenuSS extends ConsumerWidget {
                         return ListTile(
                           leading: InkWell(
                             onTap: () {
-                              DBService.set("nama", item['nama']);
-                              DBService.set("crew", item['crew']);
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => PageDetilSS(nrp: item['nrp']),
+                                  builder: (context) => PageDetilSS(
+                                    nrp: item['nrp'],
+                                    nama: item['nama'],
+                                  ),
                                 ),
                               );
                             },

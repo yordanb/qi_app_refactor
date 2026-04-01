@@ -5,7 +5,6 @@ import "package:android_id/android_id.dart";
 import "../component/my_button.dart";
 import "../component/my_textfield.dart";
 import "auth_service.dart";
-import "db_service.dart";
 import "register_page.dart";
 import "../screens/mainMenu.dart"; // Halaman utama
 
@@ -33,9 +32,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _initServices() async {
-    await DBService.init();
-    await _loadFCMToken();
-
+    // DBService init tidak diperlukan lagi (migrated to SecureStorage)
     if (!widget.isAlreadyRegistered) {
       await _getAndroidID();
     }
@@ -63,12 +60,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // Ambil FCM token dari DBService
-  Future<void> _loadFCMToken() async {
-    final token = DBService.get("fCMToken");
-    setState(() => fcmToken = token);
-  }
-
   // Fungsi login
   Future<void> signUserIn(
     BuildContext context, {
@@ -84,8 +75,6 @@ class _LoginPageState extends State<LoginPage> {
         androidId: androidID,
         loginAs: stateLoginAs,
       );
-
-      await DBService.set("nrp", nrp);
 
       Navigator.pushReplacement(
         context,

@@ -4,15 +4,15 @@ import "package:android_id/android_id.dart";
 import "../core/network/dio_client.dart";
 import "../core/storage/secure_storage_service.dart";
 import "../core/errors/exceptions.dart";
-import "db_service.dart"; // TODO: Remove after migration complete
 
 class AuthService {
   final DioClient _dioClient = DioClient();
+  final SecureStorageService _storage = SecureStorageService();
 
   /// Ambil Android ID
   Future<String?> getAndroidId() async {
     const androidIdPlugin = AndroidId();
-    return androidIdPlugin.getId();
+    return await androidIdPlugin.getId();
   }
 
   /// Mengecek apakah Android ID sudah terdaftar
@@ -35,13 +35,12 @@ class AuthService {
           final String? refreshToken = responseData["refresh_token"];
 
           // Simpan ke secure storage
-          await SecureStorageService.setToken(token);
+          await _storage.setToken(token);
           if (refreshToken != null) {
-            await SecureStorageService.setRefreshToken(refreshToken);
+            await _storage.setRefreshToken(refreshToken);
           }
-          await SecureStorageService.setNRP(nrp);
-          await SecureStorageService.setRole(role);
-          // Jangan simpan expired_at karena backend handle refresh
+          await _storage.setNRP(nrp);
+          await _storage.setRole(role);
 
           return true;
         }
@@ -76,15 +75,11 @@ class AuthService {
         final String refreshToken = responseData["refresh_token"];
         final String role = responseData["role"];
 
-        await SecureStorageService.setToken(token);
-        await SecureStorageService.setRefreshToken(refreshToken);
-        await SecureStorageService.setNRP(nrp);
-        await SecureStorageService.setRole(role);
+        await _storage.setToken(token);
+        await _storage.setRefreshToken(refreshToken);
+        await _storage.setNRP(nrp);
+        await _storage.setRole(role);
 
-        // Legacy: simpan juga ke SharedPreferences untuk一時 migration
-        await DBService.set("token", token);
-        await DBService.set("nrp", nrp);
-        await DBService.set("role", role);
       } else {
         throw ApiException(
           response.data?["message"] ?? "Login gagal. NRP atau password salah.",
@@ -100,27 +95,22 @@ class AuthService {
 
   /// Logout dan hapus token
   Future<void> logout() async {
-    await SecureStorageService.clearAuth();
-    await DBService.clear("token");
-    await DBService.clear("nrp");
-    await DBService.clear("role");
-    await DBService.clear("expired_at");
+    await _storage.clearAuth();
   }
 
-  /// Cek apakah token masih valid (backend akan handle via refresh)
-  Future<bool> hasValidToken() async {
-    final token = await SecureStorageService.getToken();
-    final expiredAtString = await SecureStorageService.getExpiredAt();
-    if (token == null || expiredAtString == null) return false;
-
-    final expiredAt = DateTime.tryParse(expiredAtString);
-    if (expiredAt == null) return false;
-
-    return DateTime.now().isBefore(expiredAt);
+  /// Cek apakah user sudah login (ada token)
+  Future<bool> isLoggedIn() async {
+    final token = await _storage.getToken();
+    return token != null;
   }
 
   /// Get current role dari secure storage
   Future<String?> getRole() async {
-    return SecureStorageService.getRole();
+    return await _storage.getRole();
+  }
+
+  /// Get NRP dari secure storage
+  Future<String?> getNRP() async {
+    return await _storage.getNRP();
   }
 }
