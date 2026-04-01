@@ -1,7 +1,7 @@
-import 'package:dio/dio.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
-import '../errors/exceptions.dart';
-import '../storage/secure_storage_service.dart';
+import "package:dio/dio.dart";
+import "package:connectivity_plus/connectivity_plus.dart";
+import "../errors/exceptions.dart";
+import "../storage/secure_storage_service.dart";
 
 /// Advanced HTTP client dengan interceptors, retry, dan error handling
 class DioClient {
@@ -16,12 +16,12 @@ class DioClient {
   final Connectivity _connectivity = Connectivity();
 
   /// Base URLs
-  static const String _productionBase = 'https://api.mibt.my.id';
-  static const String _developmentBase = 'http://209.182.237.240:5005';
+  static const String _productionBase = "https://api.mibt.my.id";
+  static const String _developmentBase = "http://209.182.237.240:5005";
 
   /// Environment flag - ubah sesuai kebutuhan
   static bool get isDevelopment =>
-      const bool.fromEnvironment('dart.vm.product') == false;
+      const bool.fromEnvironment("dart.vm.product") == false;
 
   String get _baseUrl => isDevelopment ? _developmentBase : _productionBase;
 
@@ -32,8 +32,8 @@ class DioClient {
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 30),
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          "Content-Type": "application/json",
+          "Accept": "application/json",
         },
       ),
     );
@@ -78,41 +78,38 @@ class _AuthInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     // Inject token jika ada
-    final token = await _storage.getToken();
+    final token = await SecureStorageService.getToken();
     if (token != null) {
-      options.headers['Authorization'] = 'Bearer $token';
+      options.headers["Authorization"] = "Bearer $token";
     }
     handler.next(options);
   }
 
   @override
-  void onError(
-    DioException err,
-    ErrorInterceptorHandler handler,
-  ) async {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
     // Jika 401, coba refresh token sekali
     if (err.response?.statusCode == 401) {
-      final refreshToken = await _storage.getRefreshToken();
+      final refreshToken = await SecureStorageService.getRefreshToken();
       if (refreshToken != null) {
         try {
           final refreshResponse = await _dio.post(
-            '/auth/refresh', // endpoint refresh - sesuaikan dengan backend
-            data: {'refresh_token': refreshToken},
+            "/auth/refresh", // endpoint refresh - sesuaikan dengan backend
+            data: {"refresh_token": refreshToken},
           );
 
           if (refreshResponse.statusCode == 200) {
-            final newToken = refreshResponse.data['token'];
-            final newRefreshToken = refreshResponse.data['refresh_token'];
+            final newToken = refreshResponse.data["token"];
+            final newRefreshToken = refreshResponse.data["refresh_token"];
 
             // Simpan token baru
-            await _storage.setToken(newToken);
+            await SecureStorageService.setToken(newToken);
             if (newRefreshToken != null) {
-              await _storage.setRefreshToken(newRefreshToken);
+              await SecureStorageService.setRefreshToken(newRefreshToken);
             }
 
             // Retry request dengan token baru
             final requestOptions = err.requestOptions;
-            requestOptions.headers['Authorization'] = 'Bearer $newToken';
+            requestOptions.headers["Authorization"] = "Bearer $newToken";
 
             final response = await _dio.fetch(requestOptions);
             return handler.resolve(response);
@@ -137,28 +134,22 @@ class _LoggingInterceptor extends Interceptor {
   _LoggingInterceptor(this._isEnabled);
 
   @override
-  void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) {
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     if (_isEnabled) {
-      print('➡️  ${options.method} ${options.uri}');
-      print('Headers: ${options.headers}');
+      print("➡️  ${options.method} ${options.uri}");
+      print("Headers: ${options.headers}");
       if (options.data != null) {
-        print('Body: ${options.data}');
+        print("Body: ${options.data}");
       }
     }
     handler.next(options);
   }
 
   @override
-  void onResponse(
-    Response response,
-    ResponseInterceptorHandler handler,
-  ) {
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
     if (_isEnabled) {
-      print('⬅️  ${response.statusCode} ${response.requestOptions.uri}');
-      print('Response: ${response.data}');
+      print("⬅️  ${response.statusCode} ${response.requestOptions.uri}");
+      print("Response: ${response.data}");
     }
     handler.next(response);
   }
@@ -166,8 +157,8 @@ class _LoggingInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     if (_isEnabled) {
-      print('❌ Error: ${err.message}');
-      print('URI: ${err.requestOptions.uri}');
+      print("❌ Error: ${err.message}");
+      print("URI: ${err.requestOptions.uri}");
     }
     handler.next(err);
   }
@@ -189,7 +180,9 @@ class _RetryInterceptor extends Interceptor {
       final retryCount = err.requestOptions.retryCount + 1;
       final delay = _calculateDelay(retryCount);
 
-      print('🔄 Retrying ${err.requestOptions.uri} (attempt $retryCount) after $delay');
+      print(
+        "🔄 Retrying ${err.requestOptions.uri} (attempt $retryCount) after $delay",
+      );
 
       await Future.delayed(delay);
 
@@ -273,17 +266,17 @@ class _ErrorInterceptor extends Interceptor {
             return UnauthorizedException();
           case 403:
             return ApiException(
-              'Akses ditolak. Anda tidak memiliki izin.',
+              "Akses ditolak. Anda tidak memiliki izin.",
               statusCode: statusCode,
             );
           case 404:
             return ApiException(
-              'Resource tidak ditemukan.',
+              "Resource tidak ditemukan.",
               statusCode: statusCode,
             );
           case 500:
             return ServerException(
-              'Server error. Silakan coba lagi nanti.',
+              "Server error. Silakan coba lagi nanti.",
               statusCode: statusCode,
             );
           default:
@@ -293,7 +286,7 @@ class _ErrorInterceptor extends Interceptor {
             );
         }
       case DioExceptionType.cancel:
-        return ApiException('Request dibatalkan.');
+        return ApiException("Request dibatalkan.");
       case DioExceptionType.unknown:
       default:
         return NoInternetException();

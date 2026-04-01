@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import "package:flutter/material.dart";
+import "package:flutter_riverpod/flutter_riverpod.dart";
 
 /// Global error handler untuk menampilkan error snackbar atau dialog
 class ErrorHandler {
@@ -40,11 +40,7 @@ class AsyncErrorWidget extends ConsumerWidget {
   final String? fallbackMessage;
   final VoidCallback? onRetry;
 
-  const AsyncErrorWidget({
-    super.key,
-    this.fallbackMessage,
-    this.onRetry,
-  });
+  const AsyncErrorWidget({super.key, this.fallbackMessage, this.onRetry});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -67,7 +63,7 @@ class AsyncErrorWidget extends ConsumerWidget {
           const Icon(Icons.error_outline, color: Colors.red, size: 48),
           const SizedBox(height: 16),
           Text(
-            fallbackMessage ?? 'Terjadi kesalahan',
+            fallbackMessage ?? "Terjadi kesalahan",
             style: const TextStyle(fontSize: 16),
             textAlign: TextAlign.center,
           ),
@@ -76,7 +72,7 @@ class AsyncErrorWidget extends ConsumerWidget {
             ElevatedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('Coba Lagi'),
+              label: const Text("Coba Lagi"),
             ),
           ],
         ],

@@ -1,13 +1,13 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:android_id/android_id.dart';
+import "package:flutter/foundation.dart";
+import "package:flutter/material.dart";
+import "package:android_id/android_id.dart";
 
-import '../component/my_button.dart';
-import '../component/my_textfield.dart';
-import 'auth_service.dart';
-import 'db_service.dart';
-import 'register_page.dart';
-import '../screens/mainMenu.dart'; // Halaman utama
+import "../component/my_button.dart";
+import "../component/my_textfield.dart";
+import "auth_service.dart";
+import "db_service.dart";
+import "register_page.dart";
+import "../screens/mainMenu.dart"; // Halaman utama
 
 class LoginPage extends StatefulWidget {
   final bool isAlreadyRegistered;
@@ -23,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
 
   String androidID = "";
   String? fcmToken = "";
-  String buttonText = 'Login';
+  String buttonText = "Login";
   bool isPressed = false;
 
   @override
@@ -95,12 +95,12 @@ class _LoginPageState extends State<LoginPage> {
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
-          title: const Text('Login Failed'),
-          content: const Text('Invalid NRP or password.'),
+          title: const Text("Login Failed"),
+          content: const Text("Invalid NRP or password."),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
+              child: const Text("OK"),
             ),
           ],
         ),
@@ -110,12 +110,12 @@ class _LoginPageState extends State<LoginPage> {
 
   // Tombol long-press handler
   void onLongPress() {
-    setState(() => buttonText = 'Login as');
+    setState(() => buttonText = "Login as");
   }
 
   void onLongPressEnd(LongPressEndDetails details) {
     setState(() {
-      buttonText = 'Login';
+      buttonText = "Login";
       isPressed = false;
     });
   }
@@ -138,20 +138,20 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 50),
                 Text(
-                  'Welcome back Innovator,\n you\'ve been missed!',
+                  "Welcome back Innovator,\n you've been missed!",
                   style: TextStyle(color: Colors.grey[700], fontSize: 16),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 25),
                 MyTextField(
                   controller: nrpController,
-                  hintText: 'NRP',
+                  hintText: "NRP",
                   obscureText: false,
                 ),
                 const SizedBox(height: 10),
                 MyTextField(
                   controller: passwordController,
-                  hintText: 'Password',
+                  hintText: "Password",
                   obscureText: true,
                 ),
                 const SizedBox(height: 10),
@@ -161,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Text(
-                        'Forgot Password?',
+                        "Forgot Password?",
                         style: TextStyle(color: Colors.grey[600]),
                       ),
                     ],
@@ -180,7 +180,7 @@ class _LoginPageState extends State<LoginPage> {
                   onLongPressEnd: onLongPressEnd,
                   child: MyButton(
                     onTap: () {
-                      final isLoginAs = buttonText == 'Login as';
+                      final isLoginAs = buttonText == "Login as";
                       signUserIn(context, stateLoginAs: isLoginAs);
                     },
                     text: buttonText,
@@ -198,7 +198,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: 120),
                 const Text(
-                  'Supported by QI Agent Plant 2 KIDE',
+                  "Supported by QI Agent Plant 2 KIDE",
                   style: TextStyle(color: Colors.black, fontSize: 16),
                 ),
                 const SizedBox(height: 10),

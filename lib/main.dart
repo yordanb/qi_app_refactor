@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:qi_app_refact/screens/mainMenu.dart';
-import './auth/db_service.dart';
+import "package:flutter/material.dart";
+import "package:flutter_riverpod/flutter_riverpod.dart";
+import "package:qi_app_refact/screens/mainMenu.dart";
+import "./auth/db_service.dart";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // wajib untuk init async di main
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'QI App',
+      title: "QI App",
       theme: ThemeData(primarySwatch: Colors.deepOrange),
       home: const CardExample(), // Halaman utama
     );
