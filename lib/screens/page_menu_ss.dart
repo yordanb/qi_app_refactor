@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import '../providers/ss_provider.dart';
+import '../providers/connectivity_provider.dart';
 import '../models/ss_filter_params.dart';
 import '../auth/db_service.dart';
 import '../screens/page_detil_ss.dart';
 import '../auth/login_page.dart';
+import '../component/error_handler.dart';
 
 class PageMenuSS extends ConsumerWidget {
   const PageMenuSS({super.key});
@@ -46,41 +48,48 @@ class PageMenuSS extends ConsumerWidget {
           Expanded(
             child: ssData.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Error: $e')),
-              data: (list) => ListView.builder(
-                padding: const EdgeInsets.all(10),
-                itemCount: list.length,
-                itemBuilder: (context, index) {
-                  final item = list[index];
-                  return ListTile(
-                    leading: InkWell(
-                      onTap: () {
-                        DBService.set("nama", item['nama']);
-                        DBService.set("crew", item['crew']);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PageDetilSS(nrp: item['nrp']),
+              error: (e, _) => AsyncErrorWidget(
+                fallbackMessage: e.toString().contains('No internet')
+                    ? 'Tidak ada koneksi internet'
+                    : 'Gagal memuat data: $e',
+                onRetry: () => ref.refresh(ssDataProvider),
+              ),
+              data: (list) => list.isEmpty
+                  ? const Center(child: Text('Tidak ada data'))
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(10),
+                      itemCount: list.length,
+                      itemBuilder: (context, index) {
+                        final item = list[index];
+                        return ListTile(
+                          leading: InkWell(
+                            onTap: () {
+                              DBService.set("nama", item['nama']);
+                              DBService.set("crew", item['crew']);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PageDetilSS(nrp: item['nrp']),
+                                ),
+                              );
+                            },
+                            child: CircleAvatar(
+                              radius: 30,
+                              backgroundColor: _getAvatarColor(item['JmlSS']),
+                              child: Text(
+                                item['JmlSS'].toString(),
+                                style: const TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ),
                           ),
+                          title: Text('${item['no']}. ${item['nama']}'),
+                          subtitle: Text('(${item['nrp']})\n${item['crew']}'),
                         );
                       },
-                      child: CircleAvatar(
-                        radius: 30,
-                        backgroundColor: _getAvatarColor(item['JmlSS']),
-                        child: Text(
-                          item['JmlSS'].toString(),
-                          style: const TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
                     ),
-                    title: Text('${item['no']}. ${item['nama']}'),
-                    subtitle: Text('(${item['nrp']})\n${item['crew']}'),
-                  );
-                },
-              ),
             ),
           ),
         ],

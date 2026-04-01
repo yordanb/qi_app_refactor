@@ -1,25 +1,33 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:qi_app_refact/config/endpoints.dart';
+import 'package:flutter/foundation.dart';
+
+import '../core/network/dio_client.dart';
 import '../models/kpi_model.dart';
-import '../auth/db_service.dart';
+import '../core/storage/secure_storage_service.dart';
+import '../config/endpoints.dart';
 
 class KPIService {
-  static Future<KPIModel> fetchKPIData() async {
-    final token = await DBService.get("token");
-    final response = await http.get(
-      Uri.parse(Endpoint.kpiAll),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token",
-      },
-    );
+  static final DioClient _dioClient = DioClient();
+  static final SecureStorageService _storage = SecureStorageService();
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      return KPIModel.fromJson(data);
-    } else {
-      throw Exception('Gagal memuat data KPI');
+  static Future<KPIModel> fetchKPIData() async {
+    try {
+      final token = await _storage.getToken();
+
+      final response = await _dioClient.dio.get(
+        Endpoint.kpiAll,
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      if (response.statusCode == 200) {
+        return KPIModel.fromJson(response.data);
+      } else {
+        throw Exception('Gagal memuat data KPI: ${response.statusCode}');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('KPIService Error: $e');
+      }
+      rethrow;
     }
   }
 }

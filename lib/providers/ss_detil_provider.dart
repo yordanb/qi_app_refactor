@@ -1,12 +1,12 @@
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
-import '../auth/db_service.dart';
+import '../core/network/dio_client.dart';
+import '../core/storage/secure_storage_service.dart';
 import '../config/endpoints.dart';
 
-// Provider untuk ambil nama user dari SharedPreferences
+// Provider untuk ambil nama user dari SecureStorage
 final userNameProvider = FutureProvider<String?>((ref) async {
-  return DBService.get("nama");
+  final storage = SecureStorageService();
+  return await storage.getNRP(); // atau bisa juga getRole/ custom field
 });
 
 // Provider untuk ambil data detail SS berdasarkan NRP
@@ -14,21 +14,28 @@ final ssDetailProvider = FutureProvider.family<List<dynamic>, String>((
   ref,
   nrp,
 ) async {
-  final url = "${Endpoint.api}/ss/$nrp";
-  final token = DBService.get("token");
-  final response = await http.get(
-    Uri.parse(url),
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-    },
-  );
+  final dioClient = DioClient();
+  final storage = SecureStorageService();
+  final token = await storage.getToken();
 
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-    return data['response'] ?? [];
-  } else {
-    throw Exception('Gagal memuat data SS');
+  final url = "${Endpoint.api}/ss/$nrp";
+
+  try {
+    final response = await dioClient.dio.get(
+      url,
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+
+    if (response.statusCode == 200) {
+      return response.data['response'] ?? [];
+    } else {
+      throw Exception('Gagal memuat data SS: ${response.statusCode}');
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('ssDetailProvider error: $e');
+    }
+    rethrow;
   }
 });
 
@@ -37,20 +44,27 @@ final ssUpdateProvider = FutureProvider.family<String, String>((
   ref,
   nrp,
 ) async {
-  final url = "${Endpoint.api}/ss/$nrp";
-  final token = DBService.get("token");
-  final response = await http.get(
-    Uri.parse(url),
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-    },
-  );
+  final dioClient = DioClient();
+  final storage = SecureStorageService();
+  final token = await storage.getToken();
 
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-    return data['update'] ?? 'Maaf Anda belum membuat SS';
-  } else {
+  final url = "${Endpoint.api}/ss/$nrp";
+
+  try {
+    final response = await dioClient.dio.get(
+      url,
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+
+    if (response.statusCode == 200) {
+      return response.data['update'] ?? 'Maaf Anda belum membuat SS';
+    } else {
+      return 'No Data';
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('ssUpdateProvider error: $e');
+    }
     return 'No Data';
   }
 });

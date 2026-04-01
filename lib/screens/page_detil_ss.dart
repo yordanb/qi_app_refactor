@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/ss_detil_provider.dart';
 import '../auth/db_service.dart';
+import '../component/error_handler.dart';
 
 class PageDetilSS extends ConsumerWidget {
   final String nrp;
@@ -39,32 +40,39 @@ class PageDetilSS extends ConsumerWidget {
       body: SafeArea(
         child: detailData.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => const Center(child: Text('Error')),
-          data: (list) => ListView.builder(
-            padding: const EdgeInsets.all(10),
-            itemCount: list.length,
-            itemBuilder: (context, index) {
-              final item = list[index];
-              return ListTile(
-                leading: CircleAvatar(
-                  radius: 30,
-                  backgroundColor: _getAvatarColor(item['no']),
-                  foregroundColor: Colors.black,
-                  child: Text(
-                    item['no'].toString(),
-                    style: const TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-                title: Text(item['judul'] ?? '-'),
-                subtitle: Text(
-                  'Status : ${item['status'] ?? '-'}\nCreated : ${item['create'] ?? '-'}',
-                ),
-              );
-            },
+          error: (e, _) => AsyncErrorWidget(
+            fallbackMessage: e.toString().contains('No internet')
+                ? 'Tidak ada koneksi internet'
+                : 'Gagal memuat detail: ${e.toString()}',
+            onRetry: () => ref.refresh(ssDetailProvider(nrp)),
           ),
+          data: (list) => list.isEmpty
+              ? const Center(child: Text('Tidak ada data detail'))
+              : ListView.builder(
+                  padding: const EdgeInsets.all(10),
+                  itemCount: list.length,
+                  itemBuilder: (context, index) {
+                    final item = list[index];
+                    return ListTile(
+                      leading: CircleAvatar(
+                        radius: 30,
+                        backgroundColor: _getAvatarColor(item['no']),
+                        foregroundColor: Colors.black,
+                        child: Text(
+                          item['no'].toString(),
+                          style: const TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      title: Text(item['judul'] ?? '-'),
+                      subtitle: Text(
+                        'Status : ${item['status'] ?? '-'}\nCreated : ${item['create'] ?? '-'}',
+                      ),
+                    );
+                  },
+                ),
         ),
       ),
     );

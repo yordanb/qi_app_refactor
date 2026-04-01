@@ -41,6 +41,12 @@ dependencies:
   android_id: ^0.4.0
   shared_preferences: ^2.5.3
 
+  # Production dependencies
+  flutter_secure_storage: ^9.0.0  # Secure token storage
+  dio: ^5.4.0                     # Advanced HTTP client with interceptors
+  connectivity_plus: ^6.0.0      # Network connectivity detection
+  retry: ^4.0.0                  # Retry logic with exponential backoff
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

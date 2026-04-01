@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:android_id/android_id.dart';
 import 'package:qi_app_refact/config/endpoints.dart';
 import './login_page.dart';
 import '../component/my_button.dart';
 import '../component/my_textfield.dart';
-import 'package:flutter/services.dart'; // Untuk clipboard
+import 'package:flutter/services.dart';
+import '../core/network/dio_client.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -47,16 +47,14 @@ class _RegisterPageState extends State<RegisterPage> {
       'androidID': androidID,
     };
 
-    final url = Uri.parse(Endpoint.register);
-
     try {
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: json.encode(data),
+      final dioClient = DioClient();
+      final response = await dioClient.dio.post(
+        Endpoint.register,
+        data: data,
       );
 
-      final responseData = json.decode(response.body);
+      final responseData = response.data;
 
       if (response.statusCode == 200) {
         if (responseData['status'] == 'already_registered') {
@@ -82,10 +80,10 @@ class _RegisterPageState extends State<RegisterPage> {
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Server error saat registrasi.')),
+          SnackBar(content: Text('Server error: ${response.statusCode}')),
         );
       }
-    } catch (e) {
+    } on Exception catch (e) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Terjadi kesalahan: $e")));

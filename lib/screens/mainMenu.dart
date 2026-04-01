@@ -13,6 +13,7 @@ import 'page_menu_myacvh.dart';
 import 'page_menu_sap.dart';
 import 'page_menu_ss.dart';
 import 'page_menu_ssab.dart';
+import '../component/error_handler.dart';
 
 class CardExample extends ConsumerStatefulWidget {
   const CardExample({super.key});
@@ -32,8 +33,9 @@ class _CardExampleState extends ConsumerState<CardExample> {
   }
 
   Future<void> _loadUserRole() async {
+    final storedRole = await AuthService().getRole();
     setState(() {
-      role = 'Admin'; // Dummy role, replace with actual logic
+      role = storedRole ?? 'user';
     });
   }
 
@@ -70,7 +72,12 @@ class _CardExampleState extends ConsumerState<CardExample> {
                 child: kpiAsync.when(
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
-                  error: (e, _) => Center(child: Text('Error: $e')),
+                  error: (e, _) => AsyncErrorWidget(
+                    fallbackMessage: e.toString().contains('No internet')
+                        ? 'Tidak ada koneksi internet'
+                        : 'Gagal memuat KPI: ${e.toString()}',
+                    onRetry: () => ref.refresh(kpiProvider),
+                  ),
                   data: (kpi) {
                     update = kpi.update;
                     return LayoutBuilder(
@@ -169,7 +176,12 @@ class _CardExampleState extends ConsumerState<CardExample> {
             Expanded(
               child: barAsync.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Center(child: Text('Error: $e')),
+                error: (e, _) => AsyncErrorWidget(
+                  fallbackMessage: e.toString().contains('No internet')
+                      ? 'Tidak ada koneksi internet'
+                      : 'Gagal memuat data grafik: ${e.toString()}',
+                  onRetry: () => ref.refresh(barChartProvider),
+                ),
                 data: (barData) {
                   return ListView.builder(
                     scrollDirection: Axis.horizontal,

@@ -3,8 +3,8 @@ import 'config.dart';
 
 class Endpoint {
   // Base URLs
-  static const String base = Config.apiBase;
-  static const String api = Config.apiUrl;
+  static const String base = AppConfig.apiBase;
+  static const String api = AppConfig.apiUrl;
 
   // ─── Auth ──────────────────────────────────────────────────────────────
   static const String login = '$base/auth/login';

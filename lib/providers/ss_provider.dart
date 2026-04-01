@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/ss_filter_params.dart';
 import '../services/ss_service.dart';
+import '../core/storage/secure_storage_service.dart';
 
 final ssFilterProvider = StateProvider<SSFilterParams>((ref) {
   return const SSFilterParams(
