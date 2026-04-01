@@ -12,7 +12,7 @@ class AuthService {
   /// Ambil Android ID
   Future<String?> getAndroidId() async {
     const androidIdPlugin = AndroidId();
-    return await androidIdPlugin.getId();
+    return androidIdPlugin.getId();
   }
 
   /// Mengecek apakah Android ID sudah terdaftar
@@ -106,11 +106,11 @@ class AuthService {
 
   /// Get current role dari secure storage
   Future<String?> getRole() async {
-    return await _storage.getRole();
+    return _storage.getRole();
   }
 
   /// Get NRP dari secure storage
   Future<String?> getNRP() async {
-    return await _storage.getNRP();
+    return _storage.getNRP();
   }
 }

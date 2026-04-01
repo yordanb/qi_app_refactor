@@ -8,7 +8,7 @@ import '../config/endpoints.dart';
 // Provider untuk ambil nama user dari SecureStorage
 final userNameProvider = FutureProvider<String?>((ref) async {
   final storage = SecureStorageService();
-  return await storage.getNRP(); // atau bisa juga getRole/ custom field
+  return storage.getNRP(); // atau bisa juga getRole/ custom field
 });
 
 // Provider untuk ambil data detail SS berdasarkan NRP

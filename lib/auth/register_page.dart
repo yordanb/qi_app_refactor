@@ -1,5 +1,4 @@
 import "package:flutter/material.dart";
-import "dart:convert";
 import "package:android_id/android_id.dart";
 import "package:qi_app_refact/config/endpoints.dart";
 import "./login_page.dart";
@@ -50,6 +49,7 @@ class _RegisterPageState extends State<RegisterPage> {
     try {
       final dioClient = DioClient();
       final response = await dioClient.dio.post(Endpoint.register, data: data);
+      if (!mounted) return; // Add mounted check after await
 
       final responseData = response.data;
 
@@ -81,6 +81,7 @@ class _RegisterPageState extends State<RegisterPage> {
         );
       }
     } on Exception catch (e) {
+      if (!mounted) return; // Add mounted check
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Terjadi kesalahan: $e")));

@@ -20,7 +20,7 @@ class PageDetilSS extends ConsumerWidget {
       if (nama != null) return nama;
       // Fallback: ambil dari SecureStorage (NRP通常是 nama alternate)
       final storage = SecureStorageService();
-      return await storage.getNRP(); // atau bisa buat getNama() later
+      return storage.getNRP(); // atau bisa buat getNama() later
     });
 
     return Scaffold(

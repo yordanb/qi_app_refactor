@@ -46,6 +46,7 @@ class _LoginPageState extends State<LoginPage> {
     if (id == null) return;
 
     bool isRegistered = await AuthService().checkAndroidID(id);
+    if (!mounted) return; // Add mounted check after await
     if (!isRegistered) {
       Navigator.pushReplacement(
         context,
@@ -74,12 +75,13 @@ class _LoginPageState extends State<LoginPage> {
         androidId: androidID,
         loginAs: stateLoginAs,
       );
-
+      if (!mounted) return; // Add mounted check
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const CardExample()),
       );
     } catch (_) {
+      if (!mounted) return; // Add mounted check
       showDialog(
         context: context,
         builder: (_) => AlertDialog(

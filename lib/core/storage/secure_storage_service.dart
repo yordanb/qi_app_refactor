@@ -21,28 +21,28 @@ class SecureStorageService {
   factory SecureStorageService() => _instance;
 
   /// Simpan string value
-  Future<void> setString(String key, String value) async {
-    await _storage.write(key: key, value: value);
+  Future<void> setString(String key, String value) {
+    return _storage.write(key: key, value: value);
   }
 
   /// Ambil string value
-  Future<String?> getString(String key) async {
-    return await _storage.read(key: key);
+  Future<String?> getString(String key) {
+    return _storage.read(key: key);
   }
 
   /// Hapus single key
-  Future<void> delete(String key) async {
-    await _storage.delete(key: key);
+  Future<void> delete(String key) {
+    return _storage.delete(key: key);
   }
 
   /// Hapus semua data
-  Future<void> deleteAll() async {
-    await _storage.deleteAll();
+  Future<void> deleteAll() {
+    return _storage.deleteAll();
   }
 
   /// Cek apakah key exists
-  Future<bool> containsKey(String key) async {
-    return await _storage.containsKey(key: key);
+  Future<bool> containsKey(String key) {
+    return _storage.containsKey(key: key);
   }
 
   // Convenience methods untuk token management

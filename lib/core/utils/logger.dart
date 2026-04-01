@@ -1,37 +1,33 @@
+import 'package:flutter/foundation.dart';
+
 /// Centralized logging untuk aplikasi
 /// Debug mode: semua logs terlihat
 /// Release mode: hanya error logs
-import 'package:flutter/foundation.dart';
-
 class AppLogger {
   /// Debug level - hanya muncul di development
   static void d(String message, {String? tag}) {
     if (kDebugMode) {
-      final timestamp = DateTime.now().toIso8601String().split('T')[1].split('.')[0];
-      print('[$timestamp] [DEBUG]${tag != null ? '[$tag]' : ''} $message');
+      debugPrint('DEBUG${tag != null ? '[$tag]' : ''}: $message');
     }
   }
 
   /// Info level - hanya muncul di development
   static void i(String message, {String? tag}) {
     if (kDebugMode) {
-      final timestamp = DateTime.now().toIso8601String().split('T')[1].split('.')[0];
-      print('[$timestamp] [INFO]${tag != null ? '[$tag]' : ''} $message');
+      debugPrint('INFO${tag != null ? '[$tag]' : ''}: $message');
     }
   }
 
   /// Warning - muncul di semua mode
-  static void w(String message, {String? tag, Error? error}) {
-    final timestamp = DateTime.now().toIso8601String().split('T')[1].split('.')[0];
-    print('[$timestamp] [WARN]${tag != null ? '[$tag]' : ''} $message${error != null ? '\n$error' : ''}');
+  static void w(String message, {String? tag, Object? error}) {
+    debugPrint('WARN${tag != null ? '[$tag]' : ''}: $message${error != null ? '\n$error' : ''}');
   }
 
   /// Error - selalu muncul (critical)
   static void e(String message, {String? tag, Object? error, StackTrace? stackTrace}) {
-    final timestamp = DateTime.now().toIso8601String().split('T')[1].split('.')[0];
-    print('[$timestamp] [ERROR]${tag != null ? '[$tag]' : ''} $message${error != null ? '\n$error' : ''}');
+    debugPrint('ERROR${tag != null ? '[$tag]' : ''}: $message${error != null ? '\n$error' : ''}');
     if (kDebugMode && stackTrace != null) {
-      print('Stack trace:\n$stackTrace');
+      debugPrint('Stack trace:\n$stackTrace');
     }
   }
 
