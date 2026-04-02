@@ -7,6 +7,11 @@ import '../screens/page_detil_ss.dart';
 import '../auth/login_page.dart';
 import '../component/error_handler.dart';
 
+const Map<String, List<String>> _menu2Items = {
+  "staff": ["plt2", "pch", "sse", "big wheel", "tere", "lce", "psc"],
+  "mech": ["pch", "mobile", "big wheel", "lighting", "pumping", "zero", "<5"],
+};
+
 class PageMenuSS extends ConsumerWidget {
   const PageMenuSS({super.key});
 
