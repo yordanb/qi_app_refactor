@@ -98,12 +98,12 @@ class _AuthInterceptor extends Interceptor {
       if (refreshToken != null) {
         try {
           final refreshResponse = await _dio.post(
-            "/auth/refresh", // endpoint refresh - sesuaikan dengan backend
+            "/auth/refresh",
             data: {"refresh_token": refreshToken},
           );
 
           if (refreshResponse.statusCode == 200) {
-            final newToken = refreshResponse.data["token"];
+            final newToken = refreshResponse.data["access_token"];
             final newRefreshToken = refreshResponse.data["refresh_token"];
 
             // Simpan token baru
@@ -120,10 +120,11 @@ class _AuthInterceptor extends Interceptor {
             return handler.resolve(response);
           }
         } catch (e) {
-          // Refresh gagal, clear storage dan redirect ke login
+          // Refresh gagal, clear storage dan return 401 untuk trigger logout di UI
           AppLogger.e('Refresh token failed', error: e);
           await _storage.clearAuth();
-          // TODO: navigate to login - handled di UI layer
+          // Return original error (401) so UI can redirect to login
+          return handler.next(err);
         }
       } else {
         // No refresh token, clear storage

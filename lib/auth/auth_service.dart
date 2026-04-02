@@ -29,9 +29,12 @@ class AuthService {
           print(responseData);
         }
         if (responseData["status"] == "already_registered") {
-          final String token = responseData["token"];
-          final String nrp = responseData["nrp"];
-          final String role = responseData["role"];
+          // Backend returns: {"status": "already_registered", "access_token": "...", "refresh_token": "...", "token_type": "bearer", "user": {"id":..., "nrp": "...", "email":"...", "role":"..."}}
+          final String token = responseData["access_token"];
+          // Extract nested user object
+          final userData = responseData["user"];
+          final String nrp = userData["nrp"];
+          final String role = userData["role"];
           final String? refreshToken = responseData["refresh_token"];
 
           // Simpan ke secure storage
@@ -63,7 +66,7 @@ class AuthService {
     try {
       final response = await _dioClient.dio.post(
         "/auth/login",
-        data: {"nrp": nrp, "password": password, "androidId": androidId},
+        data: {"identifier": nrp, "password": password, "androidId": androidId},
       );
 
       if (response.statusCode == 200) {
@@ -71,7 +74,8 @@ class AuthService {
           print("Login berhasil: ${response.data}");
         }
         final responseData = response.data;
-        final String token = responseData["token"];
+        // Backend returns: {"access_token": "...", "refresh_token": "...", "token_type": "bearer"}
+        final String token = responseData["access_token"];
         final String refreshToken = responseData["refresh_token"];
         final String role = responseData["role"];
 
@@ -93,8 +97,23 @@ class AuthService {
     }
   }
 
-  /// Logout dan hapus token
+  /// Logout dan hapus token + revoke refresh token di backend
   Future<void> logout() async {
+    // Revoke refresh token di backend sebelum clear storage
+    final refreshToken = await _storage.getRefreshToken();
+    if (refreshToken != null) {
+      try {
+        await _dioClient.dio.post(
+          "/auth/logout",
+          data: {"refresh_token": refreshToken},
+        );
+      } catch (e) {
+        // Log error tapi tetap lanjut clear storage
+        if (kDebugMode) {
+          print("Logout revoke error: $e");
+        }
+      }
+    }
     await _storage.clearAuth();
   }
 
