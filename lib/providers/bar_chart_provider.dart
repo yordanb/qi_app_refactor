@@ -12,14 +12,14 @@ final barChartProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>(
     final token = await storage.getToken();
 
     final List<String> endpoints = [
-      "/api/ss-all-plt2",
-      "/api/jarvis-all-plt2",
-      "/api/ipeak-all-plt2",
-      "/api/ss-zero-mech-plt2",
-      "/api/ss-zero-staff-plt2",
-      "/api/ss-approval",
-      "/api/ss-5-mech-plt2",
-      "/api/ss-5-staff-plt2",
+      "/ss-all-plt2",
+      "/jarvis-all-plt2",
+      "/ipeak-all-plt2",
+      "/ss-zero-mech-plt2",
+      "/ss-zero-staff-plt2",
+      "/ss-approval",
+      "/ss-5-mech-plt2",
+      "/ss-5-staff-plt2",
     ];
 
     final futures = endpoints.map((endpoint) async {
@@ -31,7 +31,9 @@ final barChartProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>(
         if (response.statusCode == 200) {
           return {
             "kpi": response.data['kpi'],
-            "response": List<Map<String, dynamic>>.from(response.data['response']),
+            "response": List<Map<String, dynamic>>.from(
+              response.data['response'],
+            ),
           };
         }
         return null; // failed but continue

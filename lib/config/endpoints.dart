@@ -7,8 +7,8 @@ class Endpoint {
   static final String api = AppConfig.apiUrl;
 
   // ─── Auth ──────────────────────────────────────────────────────────────
-  static final String login = "$base/auth/login";
-  static final String checkAndroidId = "$base/auth/id-cek";
+  static final String login = "$base/api/v1/auth/login";
+  static final String checkAndroidId = "$base/api/v1/auth/id-cek";
 
   // ─── KPI ───────────────────────────────────────────────────────────────
   static String kpiAll = "$api/all-kpi";

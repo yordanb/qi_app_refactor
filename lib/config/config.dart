@@ -14,7 +14,7 @@ class AppConfig {
   static final String apiBase = isDevelopment
       ? _developmentBase
       : _productionBase;
-  static final String apiUrl = "$apiBase/api";
+  static final String apiUrl = "$apiBase/api/v1";
 
   // Feature flags
   static final bool enableLogging = isDevelopment;

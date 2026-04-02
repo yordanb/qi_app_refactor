@@ -65,7 +65,7 @@ class AuthService {
   }) async {
     try {
       final response = await _dioClient.dio.post(
-        "/auth/login",
+        "/api/v1/auth/login",
         data: {"identifier": nrp, "password": password, "androidId": androidId},
       );
 
@@ -83,7 +83,6 @@ class AuthService {
         await _storage.setRefreshToken(refreshToken);
         await _storage.setNRP(nrp);
         await _storage.setRole(role);
-
       } else {
         throw ApiException(
           response.data?["message"] ?? "Login gagal. NRP atau password salah.",
@@ -104,7 +103,7 @@ class AuthService {
     if (refreshToken != null) {
       try {
         await _dioClient.dio.post(
-          "/auth/logout",
+          "/api/v1/auth/logout",
           data: {"refresh_token": refreshToken},
         );
       } catch (e) {
