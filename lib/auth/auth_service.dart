@@ -29,21 +29,20 @@ class AuthService {
           print(responseData);
         }
         if (responseData["status"] == "already_registered") {
-          // Backend returns: {"status": "already_registered", "access_token": "...", "refresh_token": "...", "token_type": "bearer", "user": {"id":..., "nrp": "...", "email":"...", "role":"..."}}
           final String token = responseData["access_token"];
-          // Extract nested user object
           final userData = responseData["user"];
           final String nrp = userData["nrp"];
-          final String role = userData["role"];
+          final String? role = userData["role_name"];
           final String? refreshToken = responseData["refresh_token"];
 
-          // Simpan ke secure storage
           await _storage.setToken(token);
           if (refreshToken != null) {
             await _storage.setRefreshToken(refreshToken);
           }
           await _storage.setNRP(nrp);
-          await _storage.setRole(role);
+          if (role != null) {
+            await _storage.setRole(role);
+          }
 
           return true;
         }
@@ -74,10 +73,11 @@ class AuthService {
           print("Login berhasil: ${response.data}");
         }
         final responseData = response.data;
-        // Backend returns: {"access_token": "...", "refresh_token": "...", "token_type": "bearer"}
+        // Backend returns: {"access_token": "...", "refresh_token": "...", "token_type": "bearer", "user": {...}}
         final String token = responseData["access_token"];
         final String refreshToken = responseData["refresh_token"];
-        final String role = responseData["role"];
+        final userData = responseData["user"];
+        final String? role = userData?["role_name"]; // "", "admin" or "user"
 
         await _storage.setToken(token);
         await _storage.setRefreshToken(refreshToken);
