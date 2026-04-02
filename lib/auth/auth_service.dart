@@ -82,7 +82,7 @@ class AuthService {
         await _storage.setToken(token);
         await _storage.setRefreshToken(refreshToken);
         await _storage.setNRP(nrp);
-        await _storage.setRole(role);
+        await _storage.setRole(role!);
       } else {
         throw ApiException(
           response.data?["message"] ?? "Login gagal. NRP atau password salah.",
