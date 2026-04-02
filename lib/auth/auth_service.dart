@@ -19,7 +19,7 @@ class AuthService {
   Future<bool> checkAndroidID(String androidID) async {
     try {
       final response = await _dioClient.dio.post(
-        "/auth/id-cek",
+        "/api/v1/auth/id-cek",
         data: {"androidID": androidID},
       );
 
