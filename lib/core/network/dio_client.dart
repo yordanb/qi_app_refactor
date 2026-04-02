@@ -18,7 +18,7 @@ class DioClient {
 
   /// Base URLs
   static const String _productionBase = "https://api.mibt.my.id";
-  static const String _developmentBase = "http://209.182.237.240:5005";
+  static const String _developmentBase = "http://10.10.10.225:3030";
 
   /// Environment flag - ubah sesuai kebutuhan
   static bool get isDevelopment =>
@@ -57,9 +57,9 @@ class DioClient {
       // connectivity_plus returns List<ConnectivityResult> in newer versions
       // Check if any network is available (not none)
       if (connectivityResult is List) {
-        return connectivityResult
-            .cast<ConnectivityResult>()
-            .any((result) => result != ConnectivityResult.none);
+        return connectivityResult.cast<ConnectivityResult>().any(
+          (result) => result != ConnectivityResult.none,
+        );
       } else if (connectivityResult is ConnectivityResult) {
         return connectivityResult != ConnectivityResult.none;
       }
@@ -91,10 +91,7 @@ class _AuthInterceptor extends Interceptor {
   }
 
   @override
-  void onError(
-    DioException err,
-    ErrorInterceptorHandler handler,
-  ) async {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
     // Jika 401, coba refresh token sekali
     if (err.response?.statusCode == 401) {
       final refreshToken = await _storage.getRefreshToken();
@@ -143,10 +140,7 @@ class _LoggingInterceptor extends Interceptor {
   _LoggingInterceptor(this._isEnabled);
 
   @override
-  void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) {
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     if (_isEnabled) {
       AppLogger.d('${options.method} ${options.uri}', tag: 'DIO');
       if (options.headers.isNotEmpty) {
@@ -160,12 +154,12 @@ class _LoggingInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(
-    Response response,
-    ResponseInterceptorHandler handler,
-  ) {
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
     if (_isEnabled) {
-      AppLogger.i('${response.statusCode} ${response.requestOptions.uri}', tag: 'DIO');
+      AppLogger.i(
+        '${response.statusCode} ${response.requestOptions.uri}',
+        tag: 'DIO',
+      );
       if (response.data != null) {
         AppLogger.i('Response: ${response.data}', tag: 'DIO');
       }
@@ -199,7 +193,10 @@ class _RetryInterceptor extends Interceptor {
       final retryCount = _getRetryCount(err) + 1;
       final delay = _calculateDelay(retryCount);
 
-      AppLogger.d('Retrying ${err.requestOptions.uri} (attempt $retryCount) after ${delay.inMilliseconds}ms', tag: 'RETRY');
+      AppLogger.d(
+        'Retrying ${err.requestOptions.uri} (attempt $retryCount) after ${delay.inMilliseconds}ms',
+        tag: 'RETRY',
+      );
 
       await Future.delayed(delay);
 
