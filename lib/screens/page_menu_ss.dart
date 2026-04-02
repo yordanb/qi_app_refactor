@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import '../providers/ss_provider.dart';
-import '../models/ss_filter_params.dart';
 import '../screens/page_detil_ss.dart';
 import '../auth/login_page.dart';
 import '../component/error_handler.dart';
@@ -175,9 +174,3 @@ class PageMenuSS extends ConsumerWidget {
     return Colors.lightBlue;
   }
 }
-
-// Kategori dan subkategori
-const Map<String, List<String>> _menu2Items = {
-  "staff": ["plt2", "pch", "sse", "big wheel", "tere", "lce", "psc"],
-  "mech": ["pch", "mobile", "big wheel", "lighting", "pumping", "zero", "<5"],
-};
